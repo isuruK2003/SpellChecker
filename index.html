@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LevenTextSuggester</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css">
+</head>
+
+<body>
+    <header>
+        LevenTextSuggester
+    </header>
+
+    <main>
+        <div class="interface container">
+            <div class="inputs">
+                <input id="input" type="text" placeholder="Enter a word...">
+            </div>
+            <div id="outputs" class="outputs">
+                <!-- <div class="output">hello</div> -->
+            </div>
+        </div>
+        <div class="info container">
+            <h2>Explaination</h2>
+            <p>
+                This is a simple text suggester made using Levenshtein distance algorithm.
+                Levenshtein distance (or commonly known as "Edit distance") is the minimum
+                number of edits necessary for a given string to mach another given string.
+                In this application the Levenshtein distance between the input and a list
+                of strings is calculated. Then the list is sorted based on the distance and
+                the first few are displayed.
+            </p>
+            <p>
+                <img id="algorithm_image"
+                    src="https://wikimedia.org/api/rest_v1/media/math/render/svg/d1367dec4582e7b945fcb976bdfe94263263e07e"
+                    alt="levenshtein_algorithm">
+            </p>
+            <h2>Code</h2>
+            <pre>
+                <code>
+// JavaScript
+
+function levDis(str1, str2) {
+    const len1 = str1.length;
+    const len2 = str2.length;
+    const dp = Array(len1 + 1).fill(null).map(() => Array(len2 + 1).fill(null));
+
+    for (let i = 0; i <= len1; i++) {
+        dp[i][0] = i;
+    }
+    for (let j = 0; j <= len2; j++) {
+        dp[0][j] = j;
+    }
+
+    for (let i = 1; i <= len1; i++) {
+        for (let j = 1; j <= len2; j++) {
+            const cost = str1[i - 1] === str2[j - 1] ? 0 : 1;
+            dp[i][j] = Math.min(
+                dp[i - 1][j] + 1,       // deletion
+                dp[i][j - 1] + 1,       // insertion
+                dp[i - 1][j - 1] + cost // substitution
+            );
+        }
+    }
+    return dp[len1][len2];
+}
+                </code>
+            </pre>
+            <pre>
+                <code>
+// Java
+
+public class Levenshtein {
+    private static int levDis(String str1, String str2, int i, int j) {
+        if (i == 0) {
+            return j;
+        }
+        if (j == 0) {
+            return i;
+        }
+        
+        int cost = str1.charAt(i - 1) == str2.charAt(j - 1) ? 0 : 1;
+        
+        int deletion = levDis(str1, str2, i - 1, j) + 1;
+        int insertion = levDis(str1, str2, i, j - 1) + 1;
+        int substitution = levDis(str1, str2, i - 1, j - 1) + cost;
+        
+        return Math.min(Math.min(deletion, insertion), substitution);
+    }
+    
+    public static void main(String[] args) {
+        // Small test
+        String str1 = "Isuru";
+        String str2 = "Sandumi"; // :)
+        int dis = levDis(str1, str2, str1.length(), str2.length());
+        System.out.println(dis);
+    }
+}
+                </code>
+            </pre>
+            <pre>
+                <code>
+# Python
+
+def lev_dis(str1, str2):
+    len1 = len(str1)
+    len2 = len(str2)
+    dp = [[0] * (len2 + 1) for _ in range(len1 + 1)]
+
+    for i in range(len1 + 1):
+        dp[i][0] = i
+    for j in range(len2 + 1):
+        dp[0][j] = j
+
+    for i in range(1, len1 + 1):
+        for j in range(1, len2 + 1):
+            cost = 0 if str1[i - 1] == str2[j - 1] else 1
+            dp[i][j] = min(
+                dp[i - 1][j] + 1,       # deletion
+                dp[i][j - 1] + 1,       # insertion
+                dp[i - 1][j - 1] + cost # substitution
+            )
+    return dp[len1][len2]
+                </code>
+            </pre>
+        </div>
+    </main>
+    
+    <footer>
+        &COPY; 2024 Isuru Karunaratna. All rights reserved.
+    </footer>
+
+    <script src="script.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/go.min.js"></script>
+    <script>hljs.highlightAll();</script>
+</body>
+
+</html>
